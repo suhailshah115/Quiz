@@ -18,7 +18,6 @@ import Questions from "./components/Questions.jsx";
 import UserTrackingMcqs from "./components/UserTrackingMcqs.jsx";
 import UserTrackingFB from "./components/UserTrackingFB.jsx";
 
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ContextProvider>
@@ -89,9 +88,8 @@ createRoot(document.getElementById("root")).render(
           />
 
           <Route path="/questions" element={<Questions />} />
-
           <Route path="/mcqs" element={<UserTrackingMcqs />} />
-          <Route path="/fill-in-the-blanks" element={<UserTrackingFB/>} />
+          <Route path="/fill-in-the-blanks" element={<UserTrackingFB />} />
         </Routes>
       </BrowserRouter>
     </ContextProvider>

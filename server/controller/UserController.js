@@ -16,7 +16,7 @@ const HandleSignup = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10);
     const createData = new User({ Fname, email, password: hashPassword });
     const saveData = await createData.save();
-    res.status(201).json({ saveData ,success:true});
+    res.status(201).json({ saveData, success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -24,23 +24,26 @@ const HandleSignup = async (req, res) => {
 
 const HandleLogin = async (req, res) => {
   const { email, password } = req.body;
-  
+
   if (!email || !password) {
-    return res.status(400).json({ success: false, error: "Email and password are required" });
+    return res
+      .status(400)
+      .json({ success: false, error: "Email and password are required" });
   }
 
   try {
     const findUser = await User.findOne({ email });
-    
+
     if (!findUser) {
       return res.status(404).json({ success: false, error: "User not found" });
     }
-    
-    
+
     const isPasswordValid = await bcrypt.compare(password, findUser.password);
-    
+
     if (!isPasswordValid) {
-      return res.status(400).json({ success: false, error: "Invalid password" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid password" });
     }
 
     // Generate the Token
@@ -65,4 +68,48 @@ const HandleLogin = async (req, res) => {
 };
 
 
-module.exports = { HandleSignup,HandleLogin };
+
+
+const handleFacebookCreate = async (req, res) => {
+  try {
+    const { Fname, id } = req.body;
+    console.log("Request Data:", Fname, id);
+
+    // Check if the user exists in the database
+    let facebookUser = await User.findOne({ fbId: id });
+
+    if (!facebookUser) {
+      // Create a new user if they don't exist
+      facebookUser = new User({
+        Fname,
+        fbId: id,
+      });
+      await facebookUser.save();
+    }
+
+    // Send response back to the frontend
+    res.status(201).json({
+      success: true,
+      message: "User successfully saved",
+      user: facebookUser,
+    });
+  } catch (error) {
+    console.error("Error saving Facebook user:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred",
+      error,
+    });
+  }
+};
+
+
+
+
+
+
+module.exports = {
+  HandleSignup,
+  HandleLogin,
+  handleFacebookCreate,
+};

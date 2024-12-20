@@ -229,12 +229,16 @@ const StudentQuestion = () => {
                   <div className="row flex-wrap md:flex-nowrap">
                     <div className="col-lg-4">
                       <div className="form_title ps-5 ">
-                        <h1 className="text-white text-center sm:text-left sm:text-red-700">
+                        <h3 className="text-white text-center sm:text-left sm:text-red-700 mt-1">
+                          <div className="text-[40px] font-semibold">
                           {currentQuestion?.question}
-                        </h1>
+                          </div>
+
+                          
+                        </h3>
                       </div>
                     </div>
-                    <div className="col-lg-4 text-center ">
+                    <div className="col-lg-4 text-center  ">
                       <div
                         className="form_img p-4 rounded-sm border-2 border-red-700 bg-white text-black text-xl font-semibold flex justify-center items-center mx-auto overflow-auto"
                         style={{

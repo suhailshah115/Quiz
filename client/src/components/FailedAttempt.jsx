@@ -1,5 +1,4 @@
 import React from 'react'
-import Failed from "../../public/assets/images/Failed.mp4"
 import { NavLink } from 'react-router-dom'
 
 const ErrorPage = () => {
@@ -15,7 +14,7 @@ const ErrorPage = () => {
           muted
           className="w-[100%] ml-5"
         >
-          <source src={Failed} type="video/mp4" />
+          <source src="../../public/assets/images/Failed.mp4" type="video/mp4" />
         </video>
             </p>
             <p className='text-base-300 text-opacity-50'> You've reached the attempt limit</p>

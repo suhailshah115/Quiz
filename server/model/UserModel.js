@@ -13,6 +13,9 @@ const UserSchema = new mongoose.Schema({
   },
   googleId:{
     type:String,
+  },
+  fbId:{
+    type:String,
   }
 });
 

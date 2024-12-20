@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./Register.css";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
 import axios from "axios";
@@ -8,10 +8,19 @@ import { ContextData } from "../Context/ContextProvider";
 import { handleError } from "../Logics/Toast";
 import { ToastContainer } from "react-toastify";
 
-const Register = () => {
-	const { setLoggedIn,loggedIn } = useContext(ContextData);
+import FacebookLogin from "@greatsumini/react-facebook-login";
 
-  const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
+const Register = () => {
+  const { setLoggedIn, loggedIn } = useContext(ContextData);
+
+
+
+
+  const [signupData, setSignupData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -26,7 +35,6 @@ const Register = () => {
     }
   };
 
-  
   const handleSignup = async () => {
     try {
       console.log("Signup data submitted:", signupData);
@@ -76,17 +84,67 @@ const Register = () => {
         setError("Login failed.");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Login error occurred.");
+      handleError(err.response?.data?.error || "Login error occurred.");
     }
   };
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const Fname = params.get("Fname");
+
+    if (Fname) {
+      localStorage.setItem("name", Fname); // Save Fname to localStorage
+      setLoggedIn(true);
+      navigate("/home");
+      console.log("Fname saved to localStorage:", Fname);
+    }
+  }, [location]);
+
   const handleGoogleLogin = () => {
     console.log("Redirecting to Google OAuth...");
-
-
-    
     window.open("http://localhost:8080/auth/google/callback", "_self");
   };
+
+
+
+
+
+  const HandleFacebookRes = async (response) => {
+    const userFacebookData = {
+      Fname: response.name, // Map Facebook name to Fname
+      id: response.id,      // Use Facebook's unique ID
+    };
+  
+    console.log("User Facebook Data:", userFacebookData);
+  
+    try {
+      // Send user data to the backend
+      const res = await axios.post("http://localhost:8080/auth/facebook", userFacebookData);
+  
+      if (res.data.success) {
+        console.log("User successfully saved:", res.data.user);
+  
+        // Save the Fname to localStorage
+        localStorage.setItem("name", res.data.user.Fname);
+        setLoggedIn(true)
+        navigate("/home")
+  
+        // You can now access this Fname in other parts of your app
+        console.log("Fname saved to localStorage:", res.data.user.Fname);
+      } else {
+        console.error("Error from backend:", res.data.message);
+      }
+    } catch (error) {
+      console.error("Error saving user to backend:", error);
+    }
+  };
+  
+  
+
+
+  
 
 
 
@@ -101,7 +159,12 @@ const Register = () => {
                   <span>Log In </span>
                   <span>Sign Up</span>
                 </h6>
-                <input className="checkbox" type="checkbox" id="reg-log" name="reg-log" />
+                <input
+                  className="checkbox"
+                  type="checkbox"
+                  id="reg-log"
+                  name="reg-log"
+                />
                 <label htmlFor="reg-log"></label>
                 <div className="card-3d-wrap mx-auto">
                   <div className="card-3d-wrapper">
@@ -129,17 +192,42 @@ const Register = () => {
                               autoComplete="off"
                             />
                           </div>
-                          <button onClick={handleLogin} className="btn mt-4">Submit</button>
+                          <button onClick={handleLogin} className="btn mt-4">
+                            Submit
+                          </button>
                           <div className="flex justify-center gap-4 mt-6">
-                            <GoogleIcon onClick={handleGoogleLogin} fontSize="small" />
-                            {/* <FacebookIcon fontSize="small" /> */}
+                          
+                          <GoogleIcon style={{color:"white",cursor: "pointer"}}
+                              onClick={handleGoogleLogin}
+                              fontSize="small"
+                            />
+<FacebookLogin
+        appId="1269513297636250"
+        onSuccess={(response) => {
+          console.log("Login Success!", response);
+        }}
+    
+        onProfileSuccess={HandleFacebookRes}
+        render={({ onClick }) => (
+          <div
+            className="facebook-custom-btn"
+            onClick={onClick}
+            style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}
+          >
+            <FacebookIcon fontSize="small" style={{ color: "white", marginRight: "8px" }} />
+          </div>
+        )}
+      />
+
+
+
+                          
                           </div>
                           <p className="mb-0 mt-4 text-center">
-                            <NavLink to={'/admin'}>
-
-                            <a href="#0" className="link">
-                        Admin_Panel
-                            </a>
+                            <NavLink to={"/admin"}>
+                              <a href="#0" className="link">
+                                Admin Panel
+                              </a>
                             </NavLink>
                           </p>
                         </div>
@@ -179,8 +267,7 @@ const Register = () => {
                               autoComplete="off"
                             />
                           </div>
-                     
-                  
+
                           <button onClick={handleSignup} className="btn mt-4">
                             Submit
                           </button>
@@ -195,7 +282,7 @@ const Register = () => {
           </div>
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

@@ -13,9 +13,9 @@ const Login = () => {
     e.preventDefault(); // Prevent page reload on form submission
     
     // Validate email and password
-    if (email === "admin@.com" && password === "12345") {
+    if (email === "admin30@.com" && password === "admin12345") {
       // Navigate to teacher page if credentials are correct
-      navigate("/Teacher");
+      navigate("/teacher");
     } else {
       handleError("Invalid email or password!")
     }

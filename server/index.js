@@ -12,7 +12,8 @@ const User =require("./model/UserModel")
 //  Express session Password
 const session=require("express-session")
 
-const passport=require("passport")
+const passport=require("passport");
+const facebookRoute = require("./Routes/FacebookRoute");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 
 
@@ -45,6 +46,9 @@ app.get("/", (req, res) => {
 
 app.use("/",userRoute)
 
+// /   UserRoute
+
+app.use("/",facebookRoute)
 
 
 // Session Setup
@@ -118,10 +122,25 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    successRedirect: "http://localhost:5173/home",
     failureRedirect: "http://localhost:5173/",
-  })
+  }),
+  (req, res) => {
+    // Get the user's Fname
+    const Fname = req.user.Fname;
+ 
+
+    // Redirect to frontend with Fname as query parameter
+    res.redirect(`http://localhost:5173/?Fname=${encodeURIComponent(Fname)}`);
+  }
 );
+
+
+
+
+
+
+
+
 
 // NoteRoute
 
