@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 const UserTrackingFB = () => {
   const [mcqs, setMcqs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [studentNames, setStudentNames] = useState(new Set()); // Track seen student names
 
   useEffect(() => {
     const getMcQs = async () => {
@@ -45,14 +44,10 @@ const UserTrackingFB = () => {
             <tbody className='text-black'>
               {mcqs.length > 0 ? (
                 mcqs.map((item, index) => {
-                  const isRepeat = studentNames.has(item.studentName);
-                  studentNames.add(item.studentName);
                   return (
                     <tr key={index} className={index % 2 === 0 ? 'bg-a6a6a6' : 'bg-white'}>
                       <th className='border border-gray-200 px-4 py-2 text-left font-bold'>{index + 1}</th>
-                      <td className='border border-gray-200 px-4 py-2 flex'>
-                        {item.studentName} {isRepeat && <p className='text-opacity-10 text-black ml-1'>(Repeat) </p>}
-                      </td>
+                      <td className='border border-gray-200 px-4 py-2'>{item.studentName}</td>
                       <td className='border border-gray-200 px-4 py-2'>{item.questionTypes}</td>
                       <td className='border border-gray-200 px-4 py-2 font-bold'>{item.score}</td>
                       <td className='border border-gray-200 px-4 py-2'>{item.totalAttempts}</td>

@@ -43,7 +43,7 @@ const Questions = () => {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-slate-800 h-screen">
       <div className="absolute top-0 left-2">
         <NavLink to={"/teacher"}>
           <KeyboardBackspaceIcon />

@@ -40,9 +40,7 @@ const StudentInterface = () => {
             Gamified E_Learning
             </h1>
             <p className="py-6 text-white ">
-              Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda
-              excepturi exercitationem quasi. In deleniti eaque aut repudiandae
-              et a id nisi.
+            Welcome to a world of fun learning! Explore and level up your skills with exciting challenges. Let's make education enjoyable together!
             </p>
             <NavLink to={"/sq"}>
               <button className="btn btn-primary">Get Started</button>
