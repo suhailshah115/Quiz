@@ -13,9 +13,8 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
-import { handleSuccess } from "../Logics/Toast";
+import { handleSuccess, handleError } from "../Logics/Toast";
 import { ToastContainer } from "react-toastify";
-
 
 const TeacherInterface = () => {
   const [allQ, setAllQ] = useState();
@@ -23,6 +22,8 @@ const TeacherInterface = () => {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState("");
+  const [columnA, setColumnA] = useState(["", "", "", "", ""]);
+  const [columnB, setColumnB] = useState(["", "", "", "", ""]);
   const [mcqMode, setMcqMode] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -32,20 +33,25 @@ const TeacherInterface = () => {
     const payload = {
       questionType: mcqMode ? "mcq" : questionType,
       question,
-      options: mcqMode || questionType === "mcq" ? options : undefined,
+      options:  questionType === "match-the-following" ||questionType === "mcq" ? options : undefined,
       correctAnswer,
+      columnA: questionType === "match-the-following" ? columnA : undefined,
+      columnB: questionType === "match-the-following" ? columnB : undefined,
     };
+
+    console.log("Submitting payload:", payload); // Log the payload
 
     try {
       const response = await axios.post("http://localhost:8080/createQuestion", payload);
       setQuestion("");
       setOptions(["", "", "", ""]);
       setCorrectAnswer("");
-      handleSuccess("Question added! successfully!")
-   
+      setColumnA(["", "", "", "", ""]);
+      setColumnB(["", "", "", "", ""]);
+      handleSuccess("Question added successfully!");
     } catch (error) {
       console.error("Error submitting question:", error);
-      alert("There was an error submitting the question.");
+      handleError("There was an error submitting the question.");
     }
   };
 
@@ -55,6 +61,17 @@ const TeacherInterface = () => {
     setOptions(updatedOptions);
   };
 
+  const handleColumnAChange = (index, newValue) => {
+    const updatedColumnA = [...columnA];
+    updatedColumnA[index] = newValue;
+    setColumnA(updatedColumnA);
+  };
+
+  const handleColumnBChange = (index, newValue) => {
+    const updatedColumnB = [...columnB];
+    updatedColumnB[index] = newValue;
+    setColumnB(updatedColumnB);
+  };
 
   const getQuestions = async () => {
     try {
@@ -110,6 +127,7 @@ const TeacherInterface = () => {
         >
           <option value="mcq">Multiple Choice Question</option>
           <option value="fill-in-the-blanks">Fill in the Blanks</option>
+          <option value="match-the-following">Match the Following</option>
         </select>
       </div>
       <div className="mb-4">
@@ -163,7 +181,62 @@ const TeacherInterface = () => {
             value={correctAnswer}
             onChange={(e) => setCorrectAnswer(e.target.value)}
           />
-    
+        </div>
+      )}
+      {questionType === "match-the-following" && (
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Column A</label>
+          {Array.isArray(columnA) &&
+            columnA.map((item, index) => (
+              <div key={index} className="mb-2 flex">
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={item}
+                  placeholder={`Column A ${index + 1}`}
+                  onChange={(e) => handleColumnAChange(index, e.target.value)}
+                />
+              </div>
+            ))}
+          <label className="block mb-2 font-medium">Column B</label>
+          {Array.isArray(columnB) &&
+            columnB.map((item, index) => (
+              <div key={index} className="mb-2 flex">
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={item}
+                  placeholder={`Column B ${index + 1}`}
+                  onChange={(e) => handleColumnBChange(index, e.target.value)}
+                />
+              </div>
+            ))}
+          <label className="block mb-2 font-medium">Options</label>
+          {Array.isArray(options) &&
+            options.map((option, index) => (
+              <div key={index} className="mb-2 flex">
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={option}
+                  placeholder={`Option ${index + 1}`}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                />
+              </div>
+            ))}
+          <label className="block mb-2 font-medium">Correct Answer</label>
+          <select
+            className="select select-bordered w-full"
+            value={correctAnswer}
+            onChange={(e) => setCorrectAnswer(e.target.value)}
+          >
+            <option value="">Select the correct answer</option>
+            {options.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
       )}
       <button onClick={handleSubmit} className="btn btn-block bg-red-700">
