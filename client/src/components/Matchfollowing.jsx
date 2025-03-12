@@ -38,7 +38,7 @@ const StudentQuestion = () => {
     try {
       const res = await axios.get("http://localhost:8080/getQuestion");
       const { questions } = res.data; // Extract the questions array
-      setQuestions(questions.filter((q) => q.questionType === "mcq")); // Set all questions
+      setQuestions(questions.filter((q) => q.questionType === "mcq" || q.questionType === "match-the-following")); // Set all questions
     } catch (error) {
       console.error("Error fetching questions:", error);
     }
@@ -65,6 +65,10 @@ const StudentQuestion = () => {
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentOptions = currentQuestion?.options || [];
+  const currentColumnA = currentQuestion?.columnA || [];
+  const currentColumnB = currentQuestion?.columnB || [];
+  const currentQuestionType = currentQuestion?.questionType;
+
 
   // Handle drag and drop logic
 
@@ -95,33 +99,37 @@ const StudentQuestion = () => {
 
   const moveToNextQuestion = (updatedScore1) => {
     if (!dragged) {
-      // Check if an option was dragged
-      return  handleError("Please drag an option before moving to the next question.")
-
-      
+      return handleError("Please drag an option before moving to the next question.");
     }
+  
+    // Save score after every question
+    saveScoreToDatabase(updatedScore1);
+  
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
       setAttempts(0);
       setAnimationKey((prev) => prev + 1);
     } else {
-      saveScoreToDatabase(updatedScore1);
+
       navigate("/submit_Quiz");
     }
   };
-
+  
+  
   const saveScoreToDatabase = async (updatedScore1) => {
     const payload = {
       time1,
       studentName1,
       score1: updatedScore1,
       totalAttempts1,
-      questionTypes1: "mcqs",
+      questionTypes1: "match-the-following",
+      
     };
-    console.log("StudnetQuestions", payload);
+    
 
     try {
-      await axios.post("http://localhost:8080/createScore1", payload);
+      console.log("payload", payload);
+      await axios.post("http://localhost:8080/createScore2", payload);
       console.log("Score saved successfully:", payload);
     } catch (error) {
       console.error("Error saving score to database:", error);
@@ -135,8 +143,8 @@ const StudentQuestion = () => {
         <div className="container-fluid px-4 sm:px-3">
           <div className="step_bar_content ps-5 pt-5">
             <h5 className="md:text-white flex items-center text-uppercase d-inline-block sm:text-red-700 font-bold">
-              {formatTime(time1)}
-              <span className="ml-10"> Attempts: {attempts}/3 </span>
+              {formatTime(time2)}
+              <span className="ml-10"> Attempts: {attempts2}/3 </span>
             </h5>
           </div>
           <div className="flex justify-center items-center text-white text-xl mt-3 sm:text-red-700">
@@ -144,7 +152,7 @@ const StudentQuestion = () => {
               className="custom-button alt text-2xl"
               style={{ backgroundColor: "#CC2A41" }}
             >
-              Score : <span className="font-bold"> {score1}</span>
+              Score : <span className="font-bold"> {score2}</span>
             </button>
           </div>
           <div className="progress_bar steps_bar flex-wrap justify-center md:justify-start mt-3 sm:mt-6 ">
@@ -286,27 +294,15 @@ const StudentQuestion = () => {
           )}
         </div>
 
-        <div className="absolute top-4 right-4">
-          <NavLink to={"/fb"}>
-            <button className="btn btn-error">filling blanks</button>
-          </NavLink>
-        </div>
-
-        <div className="absolute bottom-2 right-4">
-          <NavLink to={"/mtf"}>
-            <button className="btn btn-error">Match the following</button>
-          </NavLink>
-        </div>
-
         <div className="absolute top-4 left-4">
           <NavLink to={"/home"}>
             <ClearIcon />
           </NavLink>
-        </div>ß
+        </div>
       </div>
       <ToastContainer/>
     </div>
   );
 };
 
-export default StudentQuestion;
+export default Matchthefollowing;
